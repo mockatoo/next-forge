@@ -10,6 +10,14 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 neonConfig.webSocketConstructor = ws;
 
+// Local Postgres behind local-neon-http-proxy (CI and local e2e runs).
+if (new URL(keys().DATABASE_URL).hostname === "db.localtest.me") {
+  neonConfig.wsProxy = (host) => `${host}:4444/v2`;
+  neonConfig.useSecureWebSocket = false;
+  neonConfig.pipelineTLS = false;
+  neonConfig.pipelineConnect = false;
+}
+
 const adapter = new PrismaNeon({ connectionString: keys().DATABASE_URL });
 
 export const database = globalForPrisma.prisma || new PrismaClient({ adapter });
