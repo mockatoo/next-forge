@@ -29,7 +29,7 @@ export const POST = async () => {
     return new Response("Unauthorized", { status: 401 });
   }
   const { user } = session;
-  const orgId = session.session.activeOrganizationId ?? user.id;
+  const orgId = user.id;
 
   return authenticate({
     userId: user.id,

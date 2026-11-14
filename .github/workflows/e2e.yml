@@ -1,0 +1,66 @@
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches: [mockatoo-better-auth]
+
+jobs:
+  sign-in:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: main
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      neon-proxy:
+        image: ghcr.io/timowilhelm/local-neon-http-proxy:main
+        env:
+          PG_CONNECTION_STRING: postgres://postgres:postgres@postgres:5432/main
+        ports:
+          - 4444:4444
+    env:
+      DATABASE_URL: postgres://postgres:postgres@db.localtest.me:5432/main
+      BETTER_AUTH_SECRET: ci-only-secret-ci-only-secret-0123456789
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_WEB_URL: http://localhost:3001
+      NEXT_PUBLIC_DOCS_URL: http://localhost:3004
+      VERCEL_PROJECT_PRODUCTION_URL: http://localhost:3000
+      MOCKATOO_TEST_EMAIL: ${{ secrets.MOCKATOO_TEST_EMAIL }}
+      MOCKATOO_TEST_PASSWORD: ${{ secrets.MOCKATOO_TEST_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Lint
+        run: bun run check
+
+      - name: Create database tables
+        run: bun run db:push
+
+      - name: Unit tests
+        run: bun run test
+
+      - name: Note a skipped full sign-in
+        if: env.MOCKATOO_TEST_EMAIL == '' || env.MOCKATOO_TEST_PASSWORD == ''
+        run: echo "::notice::MOCKATOO_TEST_EMAIL and MOCKATOO_TEST_PASSWORD are not set, so the full sign-in test will skip."
+
+      - name: Install Playwright
+        working-directory: apps/app
+        run: bunx playwright install --with-deps chromium
+
+      - name: Sign-in tests
+        working-directory: apps/app
+        run: bun run test:e2e

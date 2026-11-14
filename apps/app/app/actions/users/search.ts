@@ -2,8 +2,8 @@
 
 import { auth } from "@repo/auth/server";
 import { database } from "@repo/database";
-import { headers } from "next/headers";
 import Fuse from "fuse.js";
+import { headers } from "next/headers";
 
 export const searchUsers = async (
   query: string

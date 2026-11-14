@@ -1,7 +1,7 @@
-import { prismaAdapter } from "better-auth/adapters/prisma";
 import { mockGitHub } from "@mockatoo/connect-better-auth";
 import { database } from "@repo/database";
 import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { keys } from "./keys";
 

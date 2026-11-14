@@ -13,7 +13,7 @@ export const send = async (eventType: string, payload: object) => {
 
   const svix = new Svix(svixToken);
   const session = await auth.api.getSession({ headers: await headers() });
-  const orgId = session?.session.activeOrganizationId;
+  const orgId = session?.user.id;
 
   if (!orgId) {
     return;
@@ -39,7 +39,7 @@ export const getAppPortal = async () => {
 
   const svix = new Svix(svixToken);
   const session = await auth.api.getSession({ headers: await headers() });
-  const orgId = session?.session.activeOrganizationId;
+  const orgId = session?.user.id;
 
   if (!orgId) {
     return;

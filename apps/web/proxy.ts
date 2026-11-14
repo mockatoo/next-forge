@@ -7,7 +7,11 @@ import {
   securityMiddleware,
 } from "@repo/security/proxy";
 import { createNEMO } from "@rescale/nemo";
-import { type NextFetchEvent, type NextRequest, NextResponse } from "next/server";
+import {
+  type NextFetchEvent,
+  type NextRequest,
+  NextResponse,
+} from "next/server";
 import { env } from "@/env";
 
 export const config = {
@@ -53,7 +57,10 @@ const composedMiddleware = createNEMO(
 );
 
 // The marketing site has no signed-in pages, so it runs no auth middleware.
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+export default async function proxy(
+  request: NextRequest,
+  event: NextFetchEvent
+) {
   // Run security headers first
   const headersResponse = securityHeaders();
 

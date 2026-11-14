@@ -30,7 +30,7 @@ const App = async () => {
   if (!session?.user) {
     notFound();
   }
-  const orgId = session.session.activeOrganizationId ?? session.user.id;
+  const orgId = session.user.id;
 
   return (
     <>
