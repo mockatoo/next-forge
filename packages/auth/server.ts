@@ -1,3 +1,11 @@
-import "server-only";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { database } from "@repo/database";
+import { betterAuth } from "better-auth";
+import { nextCookies } from "better-auth/next-js";
 
-export * from "@clerk/nextjs/server";
+export const auth = betterAuth({
+  database: prismaAdapter(database, {
+    provider: "postgresql",
+  }),
+  plugins: [nextCookies()],
+});

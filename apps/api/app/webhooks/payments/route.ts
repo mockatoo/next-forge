@@ -1,5 +1,4 @@
 import { analytics } from "@repo/analytics/server";
-import { clerkClient } from "@repo/auth/server";
 import { parseError } from "@repo/observability/error";
 import { log } from "@repo/observability/log";
 import type { Stripe } from "@repo/payments";
@@ -8,16 +7,11 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { env } from "@/env";
 
-const getUserFromCustomerId = async (customerId: string) => {
-  const clerk = await clerkClient();
-  const users = await clerk.users.getUserList();
-
-  const user = users.data.find(
-    (currentUser) => currentUser.privateMetadata.stripeCustomerId === customerId
-  );
-
-  return user;
-};
+// Clerk stored the Stripe customer ID in user metadata. With Better Auth, add a
+// stripeCustomerId column to the User model and look the user up here.
+const getUserFromCustomerId = async (
+  _customerId: string
+): Promise<{ id: string } | undefined> => await Promise.resolve(undefined);
 
 const handleCheckoutSessionCompleted = async (
   data: Stripe.Checkout.Session

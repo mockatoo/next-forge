@@ -1,6 +1,6 @@
 "use client";
 
-import { OrganizationSwitcher, UserButton } from "@repo/auth/client";
+import { signOut, useSession } from "@repo/auth/client";
 import { ModeToggle } from "@repo/design-system/components/mode-toggle";
 import { Button } from "@repo/design-system/components/ui/button";
 import {
@@ -53,6 +53,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { Search } from "./search";
 
@@ -191,6 +192,8 @@ const data = {
 
 export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
   const sidebar = useSidebar();
+  const router = useRouter();
+  const { data: session } = useSession();
 
   return (
     <>
@@ -204,10 +207,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                   sidebar.open ? "" : "-mx-1"
                 )}
               >
-                <OrganizationSwitcher
-                  afterSelectOrganizationUrl="/"
-                  hidePersonal
-                />
+                <span className="font-semibold">Acme Inc</span>
               </div>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -326,16 +326,22 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem className="flex items-center gap-2">
-              <UserButton
-                appearance={{
-                  elements: {
-                    rootBox: "flex overflow-hidden w-full",
-                    userButtonBox: "flex-row-reverse",
-                    userButtonOuterIdentifier: "truncate pl-0",
-                  },
+              <div className="flex w-full flex-col overflow-hidden">
+                <span className="truncate text-sm">{session?.user.name}</span>
+                <span className="truncate text-muted-foreground text-xs">
+                  {session?.user.email}
+                </span>
+              </div>
+              <Button
+                onClick={async () => {
+                  await signOut();
+                  router.push("/sign-in");
                 }}
-                showName
-              />
+                size="sm"
+                variant="ghost"
+              >
+                Sign out
+              </Button>
               <div className="flex shrink-0 items-center gap-px">
                 <ModeToggle />
                 <Button

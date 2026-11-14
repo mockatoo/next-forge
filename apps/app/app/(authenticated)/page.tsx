@@ -2,6 +2,7 @@ import { auth } from "@repo/auth/server";
 import { database } from "@repo/database";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { env } from "@/env";
 import { AvatarStack } from "./components/avatar-stack";
@@ -24,11 +25,12 @@ export const metadata: Metadata = {
 
 const App = async () => {
   const pages = await database.page.findMany();
-  const { orgId } = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  if (!orgId) {
+  if (!session?.user) {
     notFound();
   }
+  const orgId = session.session.activeOrganizationId ?? session.user.id;
 
   return (
     <>
