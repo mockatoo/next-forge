@@ -8,26 +8,34 @@ export const SignIn = () => {
   const [password, setPassword] = useState("");
 
   return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        await signIn.email({
-          email,
-          password,
-        });
-      }}
-    >
-      <input
-        onChange={(e) => setEmail(e.target.value)}
-        type="email"
-        value={email}
-      />
-      <input
-        onChange={(e) => setPassword(e.target.value)}
-        type="password"
-        value={password}
-      />
-      <button type="submit">Sign in</button>
-    </form>
+    <>
+      <button
+        onClick={() => signIn.social({ provider: "github", callbackURL: "/" })}
+        type="button"
+      >
+        Sign in with GitHub
+      </button>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await signIn.email({
+            email,
+            password,
+          });
+        }}
+      >
+        <input
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          value={email}
+        />
+        <input
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          value={password}
+        />
+        <button type="submit">Sign in</button>
+      </form>
+    </>
   );
 };
