@@ -2,6 +2,9 @@ import { getSessionCookie } from "better-auth/cookies";
 import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+// Pages and endpoints that must load without a session.
+const publicPaths = ["/sign-in", "/sign-up", "/api/auth"];
+
 export function authMiddleware(
   middlewareFn?: (
     _auth: { req: NextRequest; authorized: boolean },
@@ -27,7 +30,11 @@ export function authMiddleware(
       }
     }
 
-    if (!sessionCookie) {
+    const isPublic = publicPaths.some((path) =>
+      request.nextUrl.pathname.startsWith(path)
+    );
+
+    if (!(sessionCookie || isPublic)) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
